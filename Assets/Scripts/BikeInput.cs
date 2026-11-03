@@ -17,8 +17,8 @@ public class BikeInput : MonoBehaviour
             return;
         }
         //controls
-        if (kb.leftArrowKey.wasPressedThisFrame) bike.MoveLane(-1);
-        if (kb.rightArrowKey.wasPressedThisFrame) bike.MoveLane(1);
+        if (kb.leftArrowKey.wasPressedThisFrame && !bike.skidding) bike.MoveLane(-1);
+        if (kb.rightArrowKey.wasPressedThisFrame && !bike.skidding) bike.MoveLane(1);
         if (kb.upArrowKey.wasPressedThisFrame) bike.Pedal();
 
 
