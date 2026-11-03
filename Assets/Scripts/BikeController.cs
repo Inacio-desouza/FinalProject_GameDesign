@@ -133,7 +133,6 @@ public class BikeController : MonoBehaviour
         GUIStyle style = new GUIStyle(GUI.skin.label);
         style.fontSize = 40;
         GUI.Label(new Rect(30, 60, 1000, 60), (int)distance + " m", style);
-        GUI.Label(new Rect(30, 120, 1000, 60), "Speed: " + (int)(SpeedPercent() * 100) + "%", style);
         if (dead) GUI.Label(new Rect(30, 180, 1000, 60), deathReason + "! Space to restart", style);
     }
 }
