@@ -14,7 +14,7 @@ public class Scroller : MonoBehaviour
 
     void Update()
     {
-        if (bike.dead) return;
+        if (bike.dead || !bike.started) return;
 
         // move toward camera, slower if it's driving forward
         transform.position += Vector3.back * (bike.scrollSpeed - ownSpeed) * Time.deltaTime;

@@ -28,6 +28,7 @@ public class BikeController : MonoBehaviour
     public float skidAngle = 25f;      // how far the back swings out
     public float swingSpeed = 200f;    // degrees per second
 
+    public bool started;               // false until the player taps to start
     public bool skidding;              // set by BikeInput
     public bool dead;
     public float distance;             // score
@@ -43,7 +44,7 @@ public class BikeController : MonoBehaviour
 
     void Update()
     {
-        if (dead) return;
+        if (dead || !started) return;
 
         // normal road speed gets faster over time
         baseScrollSpeed += scrollRamp * Time.deltaTime;
@@ -94,6 +95,11 @@ public class BikeController : MonoBehaviour
         else if (speed >= maxSpeed) GameOver("Spun out");
     }
 
+    public void StartRun()
+    {
+        started = true;
+    }
+
     public void MoveLane(int direction)
     {
         lane = Mathf.Clamp(lane + direction, 0, lanes.Length - 1);
@@ -104,7 +110,7 @@ public class BikeController : MonoBehaviour
         if (!skidding) speed += pedalBoost;
     }
 
-    // 0 to 1, for the camera shake and speed bar
+    // 0 to 1, for the camera shake and sway
     public float SpeedPercent()
     {
         return Mathf.Clamp01(speed / maxSpeed);
@@ -127,12 +133,14 @@ public class BikeController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // temporary on-screen text
+    // temporary on-screen text, hidden on the title screen
     void OnGUI()
     {
+        if (!started) return;
+
         GUIStyle style = new GUIStyle(GUI.skin.label);
         style.fontSize = 40;
         GUI.Label(new Rect(30, 60, 1000, 60), (int)distance + " m", style);
-        if (dead) GUI.Label(new Rect(30, 180, 1000, 60), deathReason + "! Space to restart", style);
+        if (dead) GUI.Label(new Rect(30, 120, 1000, 60), deathReason + "! Space to restart", style);
     }
 }

@@ -1,15 +1,18 @@
 using UnityEngine;
 
+// A car that pulls out of a side street, drives across, and turns onto the road
 public class TurningCar : MonoBehaviour
 {
     public float targetX;           // lane it's turning into
     public float roadSpeed;         // speed once on the road, negative = toward the bike
     public float crossSpeed = 4f;   // how fast it drives across
     public float turnSpeed = 300f;  // how fast it turns, degrees per second
+    public float honkDistance = 18f; // honks when it gets this close to the bike
 
     Scroller scroller;
     BikeController bike;
     bool onRoad;
+    bool honked;
 
     void Start()
     {
@@ -19,7 +22,14 @@ public class TurningCar : MonoBehaviour
 
     void Update()
     {
-        if (bike.dead) return;
+        if (bike.dead || !bike.started) return;
+
+        // honk once as it gets close, to warn the player
+        if (!honked && transform.position.z - bike.transform.position.z < honkDistance)
+        {
+            honked = true;
+            if (SoundManager.Instance) SoundManager.Instance.Honk();
+        }
 
         if (!onRoad)
         {

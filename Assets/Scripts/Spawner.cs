@@ -7,6 +7,8 @@ public class Spawner : MonoBehaviour
     public GameObject obstaclePrefab;
     public GameObject buildingPrefab;
     public GameObject intersectionPrefab;
+    public GameObject roadSignPrefab;   // optional
+    public GameObject pedestrianPrefab;
 
     public float spawnZ = 40f;
     public float dashGap = 3f;          // gaps between lines
@@ -21,12 +23,20 @@ public class Spawner : MonoBehaviour
     public float maxCarSpeed = 5f;      // keep below the road speed of 7
 
     // intersections
-    public float intersectionChance = 0.25f; // chance a building spot becomes an intersection
+    public float intersectionChance = 0.15f; // chance a building spot becomes an intersection
     public float turningCarChance = 0.7f;    // chance a car pulls out of it
-    public int minBlocksBetween = 6;         // building spots that must pass before another intersection
+    public int minBlocksBetween = 4;         // building spots that must pass before another intersection
+
+    // sidewalk stuff
+    public float signChance = 0.3f;          // chance of a sign next to each block
+    public float signX = 3.4f;               // how far from the center of the road
+    public float pedestrianChance = 0.08f;   // chance of a person next to each block
+    public float pedestrianX = 4f;           // the sidewalks
+    public int minBlocksBetweenPeople = 4;   // blocks that must pass before another person
 
     float obstacleGap;                  // gap until the next car, re-rolled every spawn
     int blocksSinceIntersection = 4;    // counts up every building spot
+    int blocksSincePerson = 4;          // counts up every building spot
 
     // how far the road has moved since the last spawn of each thing
     float dashDistance;
@@ -37,14 +47,14 @@ public class Spawner : MonoBehaviour
     {
         obstacleGap = Random.Range(minDistance, maxDistance);
 
-        // fill road
+        // fill road so the title screen has a city behind it
         for (float z = -10f; z < spawnZ; z += dashGap) SpawnDashes(z);
         for (float z = -10f; z < spawnZ; z += buildingGap) SpawnBuildings(z);
     }
 
     void Update()
     {
-        if (bike.dead) return;
+        if (bike.dead || !bike.started) return;
 
         float moved = bike.scrollSpeed * Time.deltaTime;
         dashDistance += moved;
@@ -94,7 +104,7 @@ public class Spawner : MonoBehaviour
     void SpawnObstacle()
     {
         int lane = Random.Range(0, bike.lanes.Length);
-        GameObject car = Instantiate(obstaclePrefab, new Vector3(bike.lanes[lane], 0.3f, spawnZ), Quaternion.identity);
+        GameObject car = Instantiate(obstaclePrefab, new Vector3(bike.lanes[lane], 0f, spawnZ), Quaternion.identity);
         Scroller scroller = car.GetComponent<Scroller>();
 
         float roll = Random.value;
@@ -125,7 +135,7 @@ public class Spawner : MonoBehaviour
         // start off to the left or right side, facing the road
         int side = Random.value < 0.5f ? -1 : 1;
         Quaternion facingRoad = Quaternion.Euler(0, side == -1 ? 90 : -90, 0);
-        GameObject car = Instantiate(obstaclePrefab, new Vector3(side * 12f, 0.3f, z), facingRoad);
+        GameObject car = Instantiate(obstaclePrefab, new Vector3(side * 12f, 0f, z), facingRoad);
 
         // pick a lane to turn into, and whether it turns with you or against you
         TurningCar turning = car.AddComponent<TurningCar>();
@@ -139,6 +149,24 @@ public class Spawner : MonoBehaviour
     {
         SpawnBuilding(-1, z); // left
         SpawnBuilding(1, z);  // right
+
+        // sometimes a sign on the sidewalk
+        if (roadSignPrefab && Random.value < signChance) SpawnSidewalkThing(roadSignPrefab, signX, z);
+
+        // people: only if enough blocks have passed since the last one
+        blocksSincePerson++;
+        if (pedestrianPrefab && blocksSincePerson >= minBlocksBetweenPeople && Random.value < pedestrianChance)
+        {
+            SpawnSidewalkThing(pedestrianPrefab, pedestrianX, z);
+            blocksSincePerson = 0;
+        }
+    }
+
+    void SpawnSidewalkThing(GameObject prefab, float x, float z)
+    {
+        int side = Random.value < 0.5f ? -1 : 1;
+        float offset = Random.Range(-2f, 2f); // so things don't line up with the buildings
+        Instantiate(prefab, new Vector3(side * x, 0f, z + offset), Quaternion.identity);
     }
 
     void SpawnBuilding(int side, float z)

@@ -9,7 +9,8 @@ public class RiderAnimator : MonoBehaviour
     public float cadence = 0.12f;    // pedal turns per second for each unit of speed
     public float swayAngle = 6f;     // how far the bike rocks at top speed, in degrees
 
-    float pedalTurns; // how far the pedals have gone around
+    float pedalTurns;                // how far the pedals have gone around
+
     void Awake()
     {
         if (!bike) bike = GetComponent<BikeController>();
@@ -17,7 +18,7 @@ public class RiderAnimator : MonoBehaviour
 
     void Update()
     {
-        if (bike.dead) return;
+        if (bike.dead || !bike.started) return;
 
         // fixed gear: legs turn with the wheels and lock up when you skid
         if (!bike.skidding)
