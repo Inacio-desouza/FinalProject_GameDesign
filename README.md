@@ -11,3 +11,6 @@ Endless runner where you weave a fixed gear bike through traffic.
 Playable gray box: lane switching, pedaling, skidding with swing,
 scrolling road, traffic, buildings, score, and three fail states:
 crashing, spinning out at max speed, or falling behind the screen.
+
+## Milestone 2
+Started on Artwork and Sound Design. Refined game mechanics and control.
