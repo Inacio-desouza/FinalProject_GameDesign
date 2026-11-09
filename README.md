@@ -1,4 +1,4 @@
-# Fixed Bike
+# Cutty Road
 Endless runner where you weave a fixed gear bike through traffic.
 
 ## Controls
